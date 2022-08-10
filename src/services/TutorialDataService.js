@@ -1,8 +1,8 @@
 import http from '../http-common'
 
 class TutorialDAtaService {
-    getAll() {
-        return http.get('/api/tutorial');
+    getAll(params) {
+        return http.get('/api/tutorial/', { params });
     }
 
     get(id) {

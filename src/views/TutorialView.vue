@@ -1,6 +1,15 @@
 <template>
     <div v-if="currentTutorial" class="edit-form">
-        <h4>Tutorial</h4>
+        <div class="d-flex justify-content-between">
+            <h4>Tutorial</h4>
+            <router-link :to="{ path: '/' }">
+                <button class="btn  btn-outline-success">
+                    Back
+                </button>
+            </router-link>
+
+
+        </div>
         <form>
             <div class="form-group">
                 <label for="title">Title</label>
@@ -10,24 +19,27 @@
                 <label for="description">Description</label>
                 <input type="text" class="form-control" id="description" v-model="currentTutorial.description" />
             </div>
-            <div class="form-group">
+            <div class="form-group  mt-2">
                 <label><strong>Status:</strong></label>
                 {{ currentTutorial.published ? "Published" : "Pending" }}
             </div>
         </form>
-        <button class="badge badge-primary mr-2" v-if="currentTutorial.published" @click="updataPublished(false)">
-            UnPublish
-        </button>
-        <button v-else class="badge badge-primary mr-2" @click="updataPublished(true)">
-            Publish
-        </button>
-        <button class="badge badge-danger mr-2" @click="deleteTutorial">
-            Delete
-        </button>
-        <button type="submit" class="badge badge-success" @click="updateTutorial">
-            Update
-        </button>
-        <p>{{ message }}</p>
+        <div class="d-flex justify-content-around mt-3">
+            <button class="btn btn-info" v-if="currentTutorial.published" @click="updataPublished(false)">
+                UnPublish
+            </button>
+            <button v-else class="btn btn-info" @click="updataPublished(true)">
+                Publish
+            </button>
+
+            <button type="button" class="btn btn-danger" @click="deleteTutorial">Delete</button>
+            <button type="button" class="btn btn-dark" @click="updateTutorial">
+                <div v-if="loading" class="spinner-border spinner-border-sm"></div>
+                <span v-if="loading" class="px-1">Updating</span>
+                <span v-else>Update</span>
+            </button>
+        </div>
+
     </div>
     <div v-else>
         <br />
@@ -37,13 +49,15 @@
 
 <script>
 import TutorialDataService from '@/services/TutorialDataService';
+import Swal from 'sweetalert2'
 
 export default {
     name: 'tutorial',
     data() {
         return {
             currentTutorial: null,
-            message: ''
+            message: '',
+            loading: false
         };
     },
     methods: {
@@ -73,20 +87,41 @@ export default {
                 })
         },
         updateTutorial() {
+            this.loading = !false
             TutorialDataService.update(this.currentTutorial._id, this.currentTutorial)
                 .then((res) => {
                     this.message = 'The tutorial was updata successfully';
+                    this.$router.push({ name: "tutorials" });
+                    this.loading = !true
                 }).catch((error) => {
                     console.log(error)
                 })
         },
         deleteTutorial() {
-            TutorialDataService.delete(this.currentTutorial._id)
-                .then((res) => {
-                    this.$router.push({ name: "tutorials" });
-                }).catch((error) => {
-                    console.log(error)
-                })
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    TutorialDataService.delete(this.currentTutorial._id)
+                        .then((res) => {
+                            this.$router.push({ name: "tutorials" });
+                        }).catch((error) => {
+                            console.log(error)
+                        })
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+
         }
     },
     mounted() {
@@ -94,7 +129,6 @@ export default {
         this.getTutorial(this.$route.params.id)
     }
 }
-
 </script>
 
 <style>

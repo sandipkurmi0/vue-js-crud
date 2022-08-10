@@ -1,7 +1,7 @@
 <template>
-  <div id='app'>
-    <nav class='navbar navbar-expand navbar-dark bg-dark'>
-      <router-link to='/' class='navbar-brand'>Sandip</router-link>
+  <div id='app' class="NavLink">
+    <nav class='navbar navbar-expand navbar-dark bg-dark '>
+      <router-link to='/' class='navbar-brand pl-30px'>Home</router-link>
       <div class='navbar-nav mr-auto'>
         <li class='nav-item'>
           <router-link to='/tutorials' class='nav-link'>Tutorials</router-link>
@@ -22,3 +22,4 @@ export default {
   name: 'app'
 }
 </script>
+
